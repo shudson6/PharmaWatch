@@ -55,6 +55,7 @@ class AgioMonitor:
                 })
             except Exception as e:
                 logger.warning(f"Error processing article: {e}")
+        driver.quit()
         for a in article_data:
             try:
                 a['content'] = pymupdf4llm.to_markdown(
