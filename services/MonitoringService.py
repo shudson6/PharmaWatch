@@ -1,5 +1,5 @@
-from capr import CaprMonitor
-import db
+from monitors.capr import CaprMonitor
+import services.db as db
 
 capr = CaprMonitor()
 articles = capr.fetch_news_articles()
