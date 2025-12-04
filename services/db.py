@@ -17,6 +17,17 @@ def get_connection_info() -> dict:
 def get_connection() -> psycopg2.extensions.connection:
     return psycopg2.connect(**get_connection_info())
 
+def get_watch_list():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT symbol FROM investing.watchlist
+        WHERE active;
+    """)
+    watchlist = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    return watchlist
+
 def save_new_article(symbol, date, title, content_type, content, url, retrieved_ts):
     conn = get_connection()
     cursor = conn.cursor()

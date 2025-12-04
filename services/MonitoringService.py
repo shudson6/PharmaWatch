@@ -1,11 +1,8 @@
-from monitors.capr import CaprMonitor
 import services.db as db
 
-capr = CaprMonitor()
-articles = capr.fetch_news_articles()
+def resolve_monitor_name(symbol: str):
+    return f"monitors.{symbol.lower()}.{symbol.capitalize()}Monitor"
 
-for a in articles:
-    db.save_new_article(
-        capr.symbol, a['date'], a['title'], a['content-type'],
-        a['content'], a['document_url'], a['retrieved_ts']
-    )
+watchlist = db.get_watch_list()
+for symbol in watchlist:
+    print(f"Monitor for {symbol}: {resolve_monitor_name(symbol)}")
