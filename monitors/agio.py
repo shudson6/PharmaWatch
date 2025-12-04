@@ -7,14 +7,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from monitors.Monitor import Monitor
+from monitors import MonitorBase
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
-class AgioMonitor(Monitor):
+class AgioMonitor(MonitorBase):
     def __init__(self):
         super().__init__(
             symbol = "AGIO",

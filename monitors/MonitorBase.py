@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
-class Monitor:
+class MonitorBase:
     def __init__(self, symbol, press_release_url=None):
         self.symbol = symbol.upper()
         self.press_release_url =\
