@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import os
 
@@ -52,6 +53,8 @@ class AgioMonitor(Monitor):
                 a['content'] = pymupdf4llm.to_markdown(
                     self.download_file(a['document_url'])
                 )
+                a['content-type'] = "text/markdown"
+                a['retrieved_ts'] = datetime.now()
             except Exception as e:
                 logging.warning(f"{type(e)} occurred while loading article {a['title'][:32]}:\n{e}")
         return article_data
