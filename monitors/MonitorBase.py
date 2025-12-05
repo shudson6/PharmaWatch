@@ -18,10 +18,12 @@ class MonitorBase:
         self.press_release_url =\
             press_release_url.lower() if press_release_url else None
 
-    def start_web_driver(self):
+    def start_web_driver(self, headless: bool = True):
         logger.debug(f"{self.symbol} starting Chrome WebDriver")
         options = Options()
         options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        if headless:
+            options.add_argument("--headless=new")
         driver = webdriver.Chrome(
             options=options,
             service=ChromeService(ChromeDriverManager().install())
