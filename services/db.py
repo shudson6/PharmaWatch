@@ -14,6 +14,18 @@ def get_connection_info() -> dict:
 def get_connection() -> psycopg2.extensions.connection:
     return psycopg2.connect(**get_connection_info())
 
+def get_titles_for_symbol(symbol: str):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT title, date
+        FROM investing.press_release
+        WHERE symbol = %s;
+    """, (symbol,))
+    titles = [(row[0], row[1]) for row in cursor.fetchall()]
+    cursor.close()
+    return titles
+
 def get_watch_list():
     conn = get_connection()
     cursor = conn.cursor()
