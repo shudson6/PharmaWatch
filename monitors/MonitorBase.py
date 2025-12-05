@@ -1,12 +1,15 @@
-from datetime import datetime
+import datetime
 import logging
 import os
 
+import dateparser
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+
+from services import db
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +34,14 @@ class MonitorBase:
         logger.debug(f"{self.symbol} Chrome WebDriver started")
         return driver
 
+    def get_existing_titles(self):
+        return db.get_titles_for_symbol(self.symbol)
+
     def fetch_news_articles(self):
         raise NotImplementedError("fetch_news_articles must be implemented by a subclass")
+
+    def parse_date(self, date_str: str) -> datetime.date:
+        return dateparser.parse(date_str).date()
 
     def download_file(self, url, dest_dir=DEFAULT_DOWNLOAD_DIR, 
                     session=None, timeout=30):
@@ -43,7 +52,7 @@ class MonitorBase:
             response.raise_for_status()
             filename = "download-{}-{}.pdf"
             filename = filename.format(self.symbol,
-                                       datetime.now().strftime('%Y%m%d%H%M%S'))
+                                       datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
             os.makedirs(dest_dir, exist_ok=True)
 
             # ensure unique filename
