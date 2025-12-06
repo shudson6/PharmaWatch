@@ -28,7 +28,7 @@ class BcrxMonitor(MonitorBase):
         articles = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((
                 By.XPATH,
-                "//div[@class='nir-widget--list']/article"
+                "//div[@class='nir-widget--content']/div/article"
             )))
         logger.debug(f"Found {len(articles)} articles on page")
         article_data = []
@@ -41,7 +41,7 @@ class BcrxMonitor(MonitorBase):
                     By.CLASS_NAME, "nir-widget--news--headline"
                 ).text.strip()
                 url = article.find_element(
-                    By.XPATH, ".//div[@class='nir-widget-file-link']/a"
+                    By.XPATH, ".//div[@class='nir-widgets-file-link']/a"
                 ).get_attribute("href")
                 if (title, self.parse_date(date)) not in existing_titles:
                     article_data.append({

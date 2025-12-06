@@ -18,7 +18,7 @@ class InvaMonitor(MonitorBase):
     def __init__(self):
         super().__init__(
             symbol = "INVA",
-            press_release_url = "https://ir.biocryst.com/news-events/press-releases"
+            press_release_url = "https://investor.inva.com/press-releases"
         )
 
     def fetch_news_articles(self):
@@ -26,7 +26,7 @@ class InvaMonitor(MonitorBase):
         driver = self.start_web_driver()
         driver.get(self.press_release_url)
         articles = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((
+            EC.presence_of_all_elements_located((
                 By.XPATH,
                 "//div[@class='nir-widget--list']/table/tbody/tr"
             )))
