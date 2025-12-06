@@ -33,7 +33,6 @@ class AldxMonitor(MonitorBase):
         logger.debug(f"Found {len(articles)} articles on page")
         article_data = []
         for article in articles:
-            logger.debug(f"Munching article...")
             try:
                 date = article.find_element(
                     By.CLASS_NAME, "nir-widget--news--date-time"
