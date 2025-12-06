@@ -18,10 +18,16 @@ def start():
         watchlist = db.get_watch_list()
         logger.debug(f"Found {len(watchlist)} watches: {watchlist}")
         for symbol in watchlist:
-            logger.debug(f"Monitor for {symbol}: {resolve_monitor_name(symbol)}")
             module_name, class_name = resolve_monitor_name(symbol)
+            logger.debug(f"Monitor for {symbol}: {module_name}.{class_name}")
             monitor: MonitorBase
-            monitor = getattr(importlib.import_module(module_name), class_name)()
+            try:
+                monitor = getattr(importlib.import_module(module_name), class_name)()
+            except (ModuleNotFoundError, AttributeError) as e:
+                logger.error(f"Failed to load monitor for {symbol}: "
+                             f"{type(e).__name__} raised on import of "
+                             f"{module_name}.{class_name}")
+                continue
             new_articles = monitor.fetch_news_articles()
             logger.info(f"Found {len(new_articles)} new articles for {symbol}")
             for a in new_articles:
@@ -31,8 +37,8 @@ def start():
                         a['content'], a['document_url'], a['retrieved_ts']
                     )
                 except Exception as e:
-                    logger.warning(f"{type(e).__name__} occurred while saving"
-                                f"article {a['title']}. Article not saved")
+                    logger.error(f"{type(e).__name__} occurred while saving"
+                                 f"article {a['title']}. Article not saved")
             for a in new_articles:
                 if "pr_id" in a:
                     SummarizationService.queue_article(a)
