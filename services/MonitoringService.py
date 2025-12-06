@@ -36,6 +36,9 @@ def start():
             for a in new_articles:
                 if "pr_id" in a:
                     SummarizationService.queue_article(a)
+            # get rid of it so maybe it get's garbage collected
+            # and thus refreshed for the next run
+            del monitor
         logger.info("MonitoringService finished. Restarting in 5 minutes.")
         import time
         time.sleep(300)
