@@ -10,7 +10,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from monitors import MonitorBase
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 

@@ -1,11 +1,32 @@
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
+import logging
+import os
 
 from dotenv import load_dotenv
 
 from services import MonitoringService, SummarizationService
 
+file_handler = logging.FileHandler(
+    os.path.join(os.getcwd(), "logs",
+                 "pharmawatch-" + datetime.now().strftime("%Y%m%d-%H%M") + ".log"),
+    encoding="utf-8",
+    delay=True,
+)
+stream_handler = logging.StreamHandler()
+logging.basicConfig(
+    format="%(asctime)s:%(levelname)s:%(name)s:%(lineno)d: %(message)s",
+    handlers=[file_handler, stream_handler],
+)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+os.makedirs(os.path.join(os.getcwd(), "logs"), exist_ok=True)
+
+logger.info("Starting PharmaWatch")
 load_dotenv()
 
+logger.info("Firing up ThreadPoolExecutor and scheduling jobs")
 executor = ThreadPoolExecutor()
 executor.submit(SummarizationService.start)
 executor.submit(MonitoringService.start)
