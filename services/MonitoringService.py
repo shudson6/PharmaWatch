@@ -28,20 +28,24 @@ def start():
                              f"{type(e).__name__} raised on import of "
                              f"{module_name}.{class_name}")
                 continue
-            new_articles = monitor.fetch_news_articles()
-            logger.info(f"Found {len(new_articles)} new articles for {symbol}")
-            for a in new_articles:
-                try:
-                    a['pr_id'] = db.save_new_article(
-                        symbol, a['date'], a['title'], a['content-type'],
-                        a['content'], a['document_url'], a['retrieved_ts']
-                    )
-                except Exception as e:
-                    logger.error(f"{type(e).__name__} occurred while saving"
-                                 f"article {a['title']}. Article not saved")
-            for a in new_articles:
-                if "pr_id" in a:
-                    SummarizationService.queue_article(a)
+            try:
+                new_articles = monitor.fetch_news_articles()
+                logger.info(f"Found {len(new_articles)} new articles for {symbol}")
+                for a in new_articles:
+                    try:
+                        a['pr_id'] = db.save_new_article(
+                            symbol, a['date'], a['title'], a['content-type'],
+                            a['content'], a['document_url'], a['retrieved_ts']
+                        )
+                    except Exception as e:
+                        logger.error(f"{type(e).__name__} occurred while saving"
+                                    f"article {a['title']}. Article not saved")
+                for a in new_articles:
+                    if "pr_id" in a:
+                        SummarizationService.queue_article(a)
+            except Exception as e:
+                logger.error(f"Unexpected {type(e).__name__} occurred while "
+                             f"monitoring {symbol} news: {e}")
             # get rid of it so maybe it get's garbage collected
             # and thus refreshed for the next run
             del monitor
