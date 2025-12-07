@@ -21,9 +21,10 @@ class InvaMonitor(MonitorBase):
             press_release_url = "https://investor.inva.com/press-releases"
         )
 
-    def fetch_news_articles(self):
+    def fetch_news_articles(self, driver=None):
+        is_our_driver = driver is None
         existing_titles = self.get_existing_titles()
-        driver = self.start_web_driver()
+        driver = driver or self.start_web_driver()
         driver.get(self.press_release_url)
         articles = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((
@@ -51,7 +52,7 @@ class InvaMonitor(MonitorBase):
                     })
             except Exception as e:
                 logger.warning(f"Error processing article: {e}")
-        driver.quit()
+        is_our_driver and driver.quit()
         for a in article_data:
             try:
                 a['content'] = pymupdf4llm.to_markdown(
