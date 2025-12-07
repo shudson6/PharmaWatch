@@ -17,6 +17,7 @@ def start():
     while True:
         watchlist = db.get_watch_list()
         logger.debug(f"Found {len(watchlist)} watches: {watchlist}")
+        driver = MonitorBase('').start_web_driver(headless=True)
         for symbol in watchlist:
             module_name, class_name = resolve_monitor_name(symbol)
             logger.debug(f"Monitor for {symbol}: {module_name}.{class_name}")
@@ -29,7 +30,7 @@ def start():
                              f"{module_name}.{class_name}")
                 continue
             try:
-                new_articles = monitor.fetch_news_articles()
+                new_articles = monitor.fetch_news_articles(driver)
                 logger.info(f"Found {len(new_articles)} new articles for {symbol}")
                 for a in new_articles:
                     try:
@@ -49,6 +50,7 @@ def start():
             # get rid of it so maybe it get's garbage collected
             # and thus refreshed for the next run
             del monitor
+        driver.quit()
         logger.info("MonitoringService finished. Restarting in 5 minutes.")
         import time
         time.sleep(300)
