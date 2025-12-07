@@ -37,7 +37,7 @@ class MonitorBase:
     def get_existing_titles(self):
         return db.get_titles_for_symbol(self.symbol)
 
-    def fetch_news_articles(self):
+    def fetch_news_articles(self, driver=None):
         raise NotImplementedError("fetch_news_articles must be implemented by a subclass")
 
     def parse_date(self, date_str: str) -> datetime.date:
