@@ -2,7 +2,7 @@ import importlib
 import logging
 
 from monitors import MonitorBase
-from services import db, SummarizationService
+from services import db, NewsAnalysisService
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ def start():
                                     f"article {a['title']}. Article not saved")
                 for a in new_articles:
                     if "pr_id" in a:
-                        SummarizationService.queue_article(a)
+                        NewsAnalysisService.queue_article(a)
             except Exception as e:
                 logger.error(f"Unexpected {type(e).__name__} occurred while "
                              f"monitoring {symbol} news: {e}")

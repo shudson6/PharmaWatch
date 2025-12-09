@@ -5,7 +5,7 @@ import os
 
 from dotenv import load_dotenv
 
-from services import MonitoringService, SummarizationService
+from services import MonitoringService, NewsAnalysisService
 
 file_handler = logging.FileHandler(
     os.path.join(os.getcwd(), "logs",
@@ -28,7 +28,7 @@ load_dotenv()
 
 logger.info("Firing up ThreadPoolExecutor and scheduling jobs")
 executor = ThreadPoolExecutor()
-executor.submit(SummarizationService.start)
+executor.submit(NewsAnalysisService.start)
 executor.submit(MonitoringService.start)
 
 # wait til jobs are done, which will never happen since they're infinite loops :)
