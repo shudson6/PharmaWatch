@@ -35,7 +35,7 @@ def start():
         logger.debug(f"Saving summary for article {article['title']}")
         try:
             db.save_new_article_summary(
-                article['pr_id'], summary_data['summary'],
+                article['pr_id'], None, None, summary_data['summary'],
                 datetime.now(), summary_data['model'], 
                 json.dumps(summary_data['prompt'])
             )

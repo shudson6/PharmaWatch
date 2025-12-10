@@ -68,7 +68,7 @@ def save_new_article(symbol, date, title, content_type, content, url, retrieved_
     cursor.close()
     return pr_id
 
-def save_new_article_summary(pr_id, summary, timestamp, model, prompt):
+def save_new_article_summary(pr_id, category, sentiment, summary, timestamp, model, prompt):
     """Save a summary for an article to the database.
 
     Args:
@@ -86,10 +86,10 @@ def save_new_article_summary(pr_id, summary, timestamp, model, prompt):
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO investing.pr_summary
-        (pr_id, summary, timestamp, model_used, prompt)
-        VALUES (%s, %s, %s, %s, %s)
+        (pr_id, category, sentiment, summary, timestamp, model_used, prompt)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         RETURNING id;
-    """, (pr_id, summary, timestamp, model, prompt))
+    """, (pr_id, category, sentiment, summary, timestamp, model, prompt))
     summary_id = cursor.fetchone()[0]
     conn.commit()
     cursor.close()
