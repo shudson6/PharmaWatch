@@ -1,6 +1,6 @@
 downloads/
 logs/
-
+_*/
 .env
 
 # python stuff
