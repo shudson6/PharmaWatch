@@ -35,7 +35,8 @@ def start():
         logger.debug(f"Saving summary for article {article['title']}")
         try:
             db.save_new_article_summary(
-                article['pr_id'], None, None, summary_data['summary'],
+                article['pr_id'], summary_data['category'],
+                summary_data['sentiment'], summary_data['summary'],
                 datetime.now(), summary_data['model'], 
                 json.dumps(summary_data['prompt'])
             )
@@ -47,12 +48,17 @@ def start():
             )
             continue
 
+PROMPT_TEMPLATE = """{}\n\nAnalyze the preceeding article and respond in the \
+following JSON format: {{\
+"summary": a brief summary highlighting the key points of the article, \
+"subject": one or two words that describe the subject of the article \
+(Earnings, Clinical Trial, Regulatory Approval, or Other), \
+"sentiment": one word description of the overall sentiment of the article \
+(Positive, Negative, Neutral)\
+}}"""
+
 def summarize_article(article: dict):
-    summary_prompt = "Summarize the following document in at most {} bullet points:\n\n{}"
-    prepared_prompt = summary_prompt.format(
-        _determine_summary_length(article['content']),
-        article['content']
-    )
+    prepared_prompt = PROMPT_TEMPLATE.format(article['content'])
     payload = { "prompt": [{
         "role": "user",
         "content": prepared_prompt,
@@ -61,13 +67,16 @@ def summarize_article(article: dict):
     response = requests.get(os.getenv("SUMMARY_URL"), json=payload)
     response.raise_for_status()
     response_body = response.json()
+    reply = json.loads(response_body.get('reply', ''))
     logger.info(f"Summary received for article {article['title']}")
     return {
-        "summary": response_body['reply'],
+        "summary": reply['summary'],
+        "category": reply['subject'],
+        "sentiment": reply['sentiment'],
         "model": response_body['model'],
         "prompt": {
             "role": "user",
-            "content": summary_prompt,
+            "content": PROMPT_TEMPLATE,
         }
     }
 
