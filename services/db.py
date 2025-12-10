@@ -40,6 +40,48 @@ def get_watch_list():
     cursor.close()
     return watchlist
 
+def get_article(symbol: str=None, title: str=None, *, pr_id: (str | int)=None):
+    """Retrieve a news article from the database.
+
+    Args:
+        symbol (str, optional): the stock symbol associated with the article
+        title (str, optional): the title of the article
+        pr_id (str | int, optional): the unique ID of the article
+
+    Returns:
+        dict: article data, or None if not found
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    if pr_id is not None:
+        cursor.execute("""
+            SELECT id, symbol, date, title, content_type, content, url, retrieved_ts
+            FROM investing.press_release
+            WHERE id = %s;
+        """, (pr_id,))
+    elif symbol is not None and title is not None:
+        cursor.execute("""
+            SELECT id, symbol, date, title, content_type, content, url, retrieved_ts
+            FROM investing.press_release
+            WHERE symbol = %s AND title = %s;
+        """, (symbol, title))
+    else:
+        raise ValueError("Either pr_id or both symbol and title must be provided")
+    row = cursor.fetchone()
+    cursor.close()
+    if row:
+        return {
+            "id": row[0],
+            "symbol": row[1],
+            "date": row[2],
+            "title": row[3],
+            "content_type": row[4],
+            "content": row[5],
+            "document_url": row[6],
+            "retrieved_ts": row[7],
+        }
+    return None
+
 def save_new_article(symbol, date, title, content_type, content, url, retrieved_ts):
     """Save an article to the database. Return the new article's ID.
 
