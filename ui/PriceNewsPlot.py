@@ -10,8 +10,9 @@ load_dotenv()
 def plot_with_news(symbol: str):
     price_history = StockDataService.fetch_price_history(symbol)[symbol.upper()]
     news_titles = db.get_titles_for_symbol(symbol.upper())
-    # build a mapping from date -> list of titles (normalize to date objects)
+    # build a mapping from date -> list of titles and sentiments (normalize to date objects)
     title_map = {}
+    sentiment_map = {}
     for title, d in news_titles:
         if hasattr(d, 'date'):
             key = d.date()
@@ -19,13 +20,17 @@ def plot_with_news(symbol: str):
             # assume it's already a date
             key = d
         title_map.setdefault(key, []).append(title)
+        # get sentiment
+        article = db.get_article_with_summary(symbol.upper(), title)
+        sentiment = article['sentiment'] if article else None
+        sentiment_map.setdefault(key, []).append(sentiment)
     catalysts = {d: True for _, d in news_titles}
     print(f"Found {len(catalysts)} catalyst dates for {symbol}")
     price_history.insert(len(price_history.columns), 'Catalyst', price_history.index.map(catalysts).fillna(False))
     plt.figure()
     plot_price_history(price_history)
     plot_volume_history(price_history)
-    plot_catalyst_dates(price_history, title_map)
+    plot_catalyst_dates(price_history, title_map, sentiment_map)
     plt.show()
 
 def plot_price_history(dataFrame):
@@ -55,14 +60,30 @@ def plot_volume_history(data):
     plt.bar(data.index, chart10 * data.Volume / maxVolume, 0.9, bottom=chartZero, color="blue")
 
 
-def plot_catalyst_dates(data, title_map=None):
+def plot_catalyst_dates(data, title_map=None, sentiment_map=None):
     top = data.High.max()
     bottom = data.Low.min()
     height = (top - bottom)
     news_dates = data[data.Catalyst == True]
     print(f"Plotting {len(news_dates)} news dates")
     ax = plt.gca()
-    bars = ax.bar(news_dates.index, height, 0.95, bottom=bottom, color="#99999944")
+    
+    # Determine colors based on sentiment
+    colors = []
+    for idx in news_dates.index:
+        try:
+            date_key = idx.date()
+        except Exception:
+            date_key = idx
+        sentiments = sentiment_map.get(date_key, []) if sentiment_map else []
+        if any(s and s.lower() == 'positive' for s in sentiments):
+            colors.append('green')
+        elif any(s and s.lower() == 'negative' for s in sentiments):
+            colors.append('red')
+        else:
+            colors.append('#999999')  # neutral color
+    
+    bars = ax.bar(news_dates.index, height, 0.95, bottom=bottom, color=colors, alpha=0.44)
 
     # attach title metadata to each bar using the date key (normalize index to date)
     for rect, idx in zip(bars, news_dates.index):
