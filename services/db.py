@@ -102,6 +102,7 @@ def get_article_with_summary(id_or_symbol: (str | int), title: str=None):
             FROM investing.press_release pr
             LEFT JOIN investing.pr_summary ps ON pr.id = ps.pr_id
             WHERE pr.id = %s;
+            ORDER BY ps.timestamp DESC LIMIT 1;
         """, (id_or_symbol,))
     else:
         cursor.execute("""
@@ -111,7 +112,8 @@ def get_article_with_summary(id_or_symbol: (str | int), title: str=None):
                    ps.timestamp, ps.model_used, ps.prompt
             FROM investing.press_release pr
             LEFT JOIN investing.pr_summary ps ON pr.id = ps.pr_id
-            WHERE pr.symbol = %s AND pr.title = %s;
+            WHERE pr.symbol = %s AND pr.title = %s
+            ORDER BY ps.timestamp DESC LIMIT 1;
         """, (id_or_symbol, title))
     row = cursor.fetchone()
     cursor.close()
