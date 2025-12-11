@@ -69,7 +69,7 @@ def get_article(id_or_symbol: (str | int), title: str=None):
     cursor.close()
     if row:
         return {
-            "id": row[0],
+            "pr_id": row[0],
             "symbol": row[1],
             "date": row[2],
             "title": row[3],
@@ -77,6 +77,61 @@ def get_article(id_or_symbol: (str | int), title: str=None):
             "content": row[5],
             "document_url": row[6],
             "retrieved_ts": row[7],
+        }
+    return None
+
+def get_article_with_summary(id_or_symbol: (str | int), title: str=None):
+    """Retrieve a news article and its summary from the database.
+
+    Args:
+        id_or_symbol (str, optional): the article ID or symbol. if title is provided,
+        this is the symbol, otherwise it is assumed to be the article ID.
+        title (str, optional): the title of the article
+
+    Returns:
+        dict: article data with summary, or None if not found
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    if title is None:
+        cursor.execute("""
+            SELECT pr.id, pr.symbol, pr.date, pr.title, pr.content_type,
+                   pr.content, pr.url, pr.retrieved_ts,
+                   ps.id, ps.category, ps.sentiment, ps.summary,
+                   ps.timestamp, ps.model_used, ps.prompt
+            FROM investing.press_release pr
+            LEFT JOIN investing.pr_summary ps ON pr.id = ps.pr_id
+            WHERE pr.id = %s;
+        """, (id_or_symbol,))
+    else:
+        cursor.execute("""
+            SELECT pr.id, pr.symbol, pr.date, pr.title, pr.content_type,
+                   pr.content, pr.url, pr.retrieved_ts,
+                   ps.id, ps.category, ps.sentiment, ps.summary,
+                   ps.timestamp, ps.model_used, ps.prompt
+            FROM investing.press_release pr
+            LEFT JOIN investing.pr_summary ps ON pr.id = ps.pr_id
+            WHERE pr.symbol = %s AND pr.title = %s;
+        """, (id_or_symbol, title))
+    row = cursor.fetchone()
+    cursor.close()
+    if row:
+        return {
+            "pr_id": row[0],
+            "symbol": row[1],
+            "date": row[2],
+            "title": row[3],
+            "content_type": row[4],
+            "content": row[5],
+            "document_url": row[6],
+            "retrieved_ts": row[7],
+            "summary_id": row[8],
+            "category": row[9],
+            "sentiment": row[10],
+            "summary": row[11],
+            "timestamp": row[12],
+            "model_used": row[13],
+            "prompt": row[14],
         }
     return None
 
