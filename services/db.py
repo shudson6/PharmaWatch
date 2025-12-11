@@ -40,33 +40,31 @@ def get_watch_list():
     cursor.close()
     return watchlist
 
-def get_article(symbol: str=None, title: str=None, *, pr_id: (str | int)=None):
+def get_article(id_or_symbol: (str | int), title: str=None):
     """Retrieve a news article from the database.
 
     Args:
-        symbol (str, optional): the stock symbol associated with the article
+        id_or_symbol (str, optional): the article ID or symbol. if title is provided,
+        this is the symbol, otherwise it is assumed to be the article ID.
         title (str, optional): the title of the article
-        pr_id (str | int, optional): the unique ID of the article
 
     Returns:
         dict: article data, or None if not found
     """
     conn = get_connection()
     cursor = conn.cursor()
-    if pr_id is not None:
+    if title is None:
         cursor.execute("""
             SELECT id, symbol, date, title, content_type, content, url, retrieved_ts
             FROM investing.press_release
             WHERE id = %s;
-        """, (pr_id,))
-    elif symbol is not None and title is not None:
+        """, (id_or_symbol,))
+    else:
         cursor.execute("""
             SELECT id, symbol, date, title, content_type, content, url, retrieved_ts
             FROM investing.press_release
             WHERE symbol = %s AND title = %s;
-        """, (symbol, title))
-    else:
-        raise ValueError("Either pr_id or both symbol and title must be provided")
+        """, (id_or_symbol, title))
     row = cursor.fetchone()
     cursor.close()
     if row:
