@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Chart } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -42,7 +42,7 @@ export default function Home() {
   const [catalysts, setCatalysts] = useState<Date[]>([]);
   const [catalystMap, setCatalystMap] = useState<any>({});
   const [selectedSummaries, setSelectedSummaries] = useState<string[]>([]);
-  const chartRef = useRef<any>();
+  const chartRef = useRef<ChartJS | null>(null);
 
   const fetchPriceHistory = async () => {
     if (!symbol) return;
@@ -106,27 +106,18 @@ export default function Home() {
     }
   };
 
-  const handleClick = (event: any, elements: any) => {
-    console.log('handleClick called', event, elements);
+  const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const chart = chartRef.current;
-    if (!chart) {
-      console.log('no chart ref');
-      return;
-    }
+    if (!chart) return;
     const rect = chart.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const xScale = chart.scales.x;
-    if (x < xScale.left || x > xScale.right) {
-      console.log('Click outside x scale area');
-      return;
-    }
+    if (x < xScale.left || x > xScale.right) return;
     const xValue = xScale.getValueForPixel(x);
-    console.log('xValue:', xValue, 'x:', x, 'event.clientX:', event.clientX, 'rect.left:', rect.left);
-    if (isNaN(xValue)) return;
+    if (xValue == null || isNaN(xValue)) return;
     const clickDate = new Date(xValue);
     if (isNaN(clickDate.getTime())) return;
     const clickDateStr = clickDate.toISOString().split('T')[0];
-    console.log('Click xValue:', xValue, 'clickDateStr:', clickDateStr);
     // find the catalyst date closest to clickDate
     const catalystDates = Object.keys(catalystMap);
     let closest = null;
@@ -139,10 +130,8 @@ export default function Home() {
       }
     }
     if (closest && minDiff < 24 * 60 * 60 * 1000) { // within 1 day
-      console.log('Closest catalyst:', closest, 'Summaries:', catalystMap[closest].summaries);
       setSelectedSummaries(catalystMap[closest].summaries.filter((s: any) => s));
     } else {
-      console.log('No close catalyst found');
       setSelectedSummaries([]);
     }
   };
