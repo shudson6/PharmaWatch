@@ -54,9 +54,10 @@ export default function Home() {
       const data = await priceResponse.json();
       const articles = await articlesResponse.json();
       const catalystMap = articles.reduce((acc: any, article: any) => {
-        const date = article.date;
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(article.sentiment);
+        const dateStr = new Date(article.date).toISOString().split('T')[0];
+        if (!acc[dateStr]) acc[dateStr] = { sentiments: [], titles: [] };
+        acc[dateStr].sentiments.push(article.sentiment);
+        acc[dateStr].titles.push(article.title);
         return acc;
       }, {});
       const catalystDates = Object.keys(catalystMap).map(d => new Date(d));
@@ -112,9 +113,23 @@ export default function Home() {
         display: true,
         text: `${symbol.toUpperCase()} Candlestick Chart`,
       },
+      tooltip: {
+        callbacks: {
+          footer: (context: any) => {
+            const date = new Date(context[0].parsed.x);
+            const dateStr = date.toISOString().split('T')[0];
+            const data = catalystMap[dateStr];
+            if (data && data.titles.length > 0) {
+              return 'News: ' + data.titles.slice(0, 3).join('; ');
+            }
+            return '';
+          },
+        },
+      },
       annotation: {
-        annotations: Object.entries(catalystMap).reduce((acc: any, [dateStr, sentiments]: [string, any], index: number) => {
+        annotations: Object.entries(catalystMap).reduce((acc: any, [dateStr, data]: [string, any], index: number) => {
           const date = new Date(dateStr);
+          const { sentiments, titles } = data;
           const hasPositive = sentiments.some((s: string) => s && s.toLowerCase() === 'positive');
           const hasNegative = sentiments.some((s: string) => s && s.toLowerCase() === 'negative');
           const color = hasPositive ? 'green' : hasNegative ? 'red' : 'orange';
@@ -125,9 +140,14 @@ export default function Home() {
             borderColor: color,
             borderWidth: 2,
             label: {
-              content: 'Catalyst',
+              content: titles.slice(0, 3).join('\n'), // Show up to 3 titles
               enabled: true,
-              position: 'top',
+              position: 'center',
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              color: 'white',
+              font: {
+                size: 12,
+              },
             },
           };
           return acc;
