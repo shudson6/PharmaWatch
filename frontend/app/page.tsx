@@ -16,7 +16,8 @@ import {
   BarElement,
 } from 'chart.js';
 import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial';
-import 'chartjs-adapter-date-fns';
+import 'chartjs-adapter-luxon';
+import annotationPlugin from 'chartjs-plugin-annotation';
 
 ChartJS.register(
   CategoryScale,
@@ -30,21 +31,29 @@ ChartJS.register(
   CandlestickController,
   CandlestickElement,
   BarController,
-  BarElement
+  BarElement,
+  annotationPlugin
 );
 
 export default function Home() {
   const [symbol, setSymbol] = useState('');
   const [chartData, setChartData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [catalysts, setCatalysts] = useState<Date[]>([]);
 
   const fetchPriceHistory = async () => {
     if (!symbol) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/price-history/${symbol}`);
-      if (!response.ok) throw new Error('Failed to fetch');
-      const data = await response.json();
+      const [priceResponse, articlesResponse] = await Promise.all([
+        fetch(`/api/price-history/${symbol}`),
+        fetch(`/api/articles/${symbol}`),
+      ]);
+      if (!priceResponse.ok || !articlesResponse.ok) throw new Error('Failed to fetch');
+      const data = await priceResponse.json();
+      const articles = await articlesResponse.json();
+      const catalystDates = [...new Set(articles.map((a: any) => a.date))].map((d: any) => new Date(d));
+      setCatalysts(catalystDates);
       const candlestickData = data.map((item: any) => ({
         x: new Date(item.Date).getTime(),
         o: item.Open,
@@ -94,6 +103,23 @@ export default function Home() {
       title: {
         display: true,
         text: `${symbol.toUpperCase()} Candlestick Chart`,
+      },
+      annotation: {
+        annotations: catalysts.reduce((acc: any, date: Date, index: number) => {
+          acc[`catalyst-${index}`] = {
+            type: 'line' as const,
+            xMin: date.getTime(),
+            xMax: date.getTime(),
+            borderColor: 'orange',
+            borderWidth: 2,
+            label: {
+              content: 'Catalyst',
+              enabled: true,
+              position: 'top',
+            },
+          };
+          return acc;
+        }, {}),
       },
     },
     scales: {
