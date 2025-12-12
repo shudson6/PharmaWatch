@@ -1,66 +1,63 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 export default function Home() {
+  const [symbol, setSymbol] = useState('');
+  const [chartData, setChartData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchPriceHistory = async () => {
+    if (!symbol) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/price-history/${symbol}`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      const labels = data.map((item: any) => item.Date);
+      const closePrices = data.map((item: any) => item.Close);
+      setChartData({
+        labels,
+        datasets: [
+          {
+            label: `${symbol.toUpperCase()} Close Price`,
+            data: closePrices,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      alert('Error fetching data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div style={{ padding: '20px' }}>
+      <h1>PharmaWatch Price History</h1>
+      <div>
+        <input
+          type="text"
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value)}
+          placeholder="Enter stock symbol (e.g., AAPL)"
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <button onClick={fetchPriceHistory} disabled={loading}>
+          {loading ? 'Loading...' : 'Fetch Price History'}
+        </button>
+      </div>
+      {chartData && (
+        <div style={{ marginTop: '20px' }}>
+          <Line data={chartData} />
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
     </div>
   );
 }
