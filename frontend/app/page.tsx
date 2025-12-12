@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Chart } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -41,6 +41,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [catalysts, setCatalysts] = useState<Date[]>([]);
   const [catalystMap, setCatalystMap] = useState<any>({});
+  const [selectedSummaries, setSelectedSummaries] = useState<string[]>([]);
+  const chartRef = useRef<any>();
 
   const fetchPriceHistory = async () => {
     if (!symbol) return;
@@ -55,9 +57,10 @@ export default function Home() {
       const articles = await articlesResponse.json();
       const catalystMap = articles.reduce((acc: any, article: any) => {
         const dateStr = new Date(article.date).toISOString().split('T')[0];
-        if (!acc[dateStr]) acc[dateStr] = { sentiments: [], titles: [] };
+        if (!acc[dateStr]) acc[dateStr] = { sentiments: [], titles: [], summaries: [] };
         acc[dateStr].sentiments.push(article.sentiment);
         acc[dateStr].titles.push(article.title);
+        acc[dateStr].summaries.push(article.summary);
         return acc;
       }, {});
       const catalystDates = Object.keys(catalystMap).map(d => new Date(d));
@@ -100,6 +103,47 @@ export default function Home() {
       alert('Error fetching data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClick = (event: any, elements: any) => {
+    console.log('handleClick called', event, elements);
+    const chart = chartRef.current;
+    if (!chart) {
+      console.log('no chart ref');
+      return;
+    }
+    const rect = chart.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const xScale = chart.scales.x;
+    if (x < xScale.left || x > xScale.right) {
+      console.log('Click outside x scale area');
+      return;
+    }
+    const xValue = xScale.getValueForPixel(x);
+    console.log('xValue:', xValue, 'x:', x, 'event.clientX:', event.clientX, 'rect.left:', rect.left);
+    if (isNaN(xValue)) return;
+    const clickDate = new Date(xValue);
+    if (isNaN(clickDate.getTime())) return;
+    const clickDateStr = clickDate.toISOString().split('T')[0];
+    console.log('Click xValue:', xValue, 'clickDateStr:', clickDateStr);
+    // find the catalyst date closest to clickDate
+    const catalystDates = Object.keys(catalystMap);
+    let closest = null;
+    let minDiff = Infinity;
+    for (const d of catalystDates) {
+      const diff = Math.abs(new Date(d).getTime() - clickDate.getTime());
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = d;
+      }
+    }
+    if (closest && minDiff < 24 * 60 * 60 * 1000) { // within 1 day
+      console.log('Closest catalyst:', closest, 'Summaries:', catalystMap[closest].summaries);
+      setSelectedSummaries(catalystMap[closest].summaries.filter((s: any) => s));
+    } else {
+      console.log('No close catalyst found');
+      setSelectedSummaries([]);
     }
   };
 
@@ -199,7 +243,15 @@ export default function Home() {
       </div>
       {chartData && (
         <div style={{ marginTop: '20px' }}>
-          <Chart type="candlestick" data={chartData} options={options} />
+          <Chart ref={chartRef} type="candlestick" data={chartData} options={options} onClick={handleClick} />
+        </div>
+      )}
+      {selectedSummaries.length > 0 && (
+        <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #fff', backgroundColor: '#000', color: '#fff' }}>
+          <h3>Article Summaries</h3>
+          {selectedSummaries.map((summary, idx) => (
+            <p key={idx}>{summary}</p>
+          ))}
         </div>
       )}
     </div>
