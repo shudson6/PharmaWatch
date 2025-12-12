@@ -40,6 +40,7 @@ export default function Home() {
   const [chartData, setChartData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [catalysts, setCatalysts] = useState<Date[]>([]);
+  const [catalystMap, setCatalystMap] = useState<any>({});
 
   const fetchPriceHistory = async () => {
     if (!symbol) return;
@@ -52,8 +53,15 @@ export default function Home() {
       if (!priceResponse.ok || !articlesResponse.ok) throw new Error('Failed to fetch');
       const data = await priceResponse.json();
       const articles = await articlesResponse.json();
-      const catalystDates = [...new Set(articles.map((a: any) => a.date))].map((d: any) => new Date(d));
+      const catalystMap = articles.reduce((acc: any, article: any) => {
+        const date = article.date;
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(article.sentiment);
+        return acc;
+      }, {});
+      const catalystDates = Object.keys(catalystMap).map(d => new Date(d));
       setCatalysts(catalystDates);
+      setCatalystMap(catalystMap);
       const candlestickData = data.map((item: any) => ({
         x: new Date(item.Date).getTime(),
         o: item.Open,
@@ -105,12 +113,16 @@ export default function Home() {
         text: `${symbol.toUpperCase()} Candlestick Chart`,
       },
       annotation: {
-        annotations: catalysts.reduce((acc: any, date: Date, index: number) => {
+        annotations: Object.entries(catalystMap).reduce((acc: any, [dateStr, sentiments]: [string, any], index: number) => {
+          const date = new Date(dateStr);
+          const hasPositive = sentiments.some((s: string) => s && s.toLowerCase() === 'positive');
+          const hasNegative = sentiments.some((s: string) => s && s.toLowerCase() === 'negative');
+          const color = hasPositive ? 'green' : hasNegative ? 'red' : 'orange';
           acc[`catalyst-${index}`] = {
             type: 'line' as const,
             xMin: date.getTime(),
             xMax: date.getTime(),
-            borderColor: 'orange',
+            borderColor: color,
             borderWidth: 2,
             label: {
               content: 'Catalyst',
