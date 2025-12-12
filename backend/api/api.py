@@ -33,8 +33,7 @@ def get_price_history(symbol: str):
     """
     logger.info(f"Received request for price history for symbol: {symbol}")
     price_history = StockDataService.fetch_price_history(symbol.upper())
-    logger.info(f"Returning {len(price_history)} price history records for symbol: {symbol}")
-    return [{
-        "Date": idx.strftime("%Y-%m-%d"),
-        "Close": price_history[symbol.upper()]["Close"][idx],
-    } for idx in price_history[symbol.upper()].index]
+    df = price_history[symbol.upper()].reset_index()
+    df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')
+    logger.info(f"Returning {len(df)} price history records for symbol: {symbol}")
+    return df.to_dict(orient="records")
