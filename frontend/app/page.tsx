@@ -12,6 +12,8 @@ import {
   Tooltip,
   Legend,
   TimeScale,
+  BarController,
+  BarElement,
 } from 'chart.js';
 import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial';
 import 'chartjs-adapter-date-fns';
@@ -26,7 +28,9 @@ ChartJS.register(
   Legend,
   TimeScale,
   CandlestickController,
-  CandlestickElement
+  CandlestickElement,
+  BarController,
+  BarElement
 );
 
 export default function Home() {
@@ -48,16 +52,28 @@ export default function Home() {
         l: item.Low,
         c: item.Close,
       }));
+      const volumeData = data.map((item: any) => ({
+        x: new Date(item.Date).getTime(),
+        y: item.Volume,
+      }));
       setChartData({
         datasets: [
           {
             label: `${symbol.toUpperCase()} Price`,
             data: candlestickData,
+            yAxisID: 'y',
             color: {
               up: 'green',
               down: 'red',
               unchanged: 'gray',
             },
+          },
+          {
+            label: `${symbol.toUpperCase()} Volume`,
+            data: volumeData,
+            type: 'bar' as const,
+            yAxisID: 'volume',
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
           },
         ],
       });
@@ -85,6 +101,25 @@ export default function Home() {
         type: 'time' as const,
         time: {
           unit: 'day' as const,
+        },
+      },
+      y: {
+        type: 'linear' as const,
+        position: 'left' as const,
+        title: {
+          display: true,
+          text: 'Price',
+        },
+      },
+      volume: {
+        type: 'linear' as const,
+        position: 'right' as const,
+        title: {
+          display: true,
+          text: 'Volume',
+        },
+        grid: {
+          drawOnChartArea: false,
         },
       },
     },
