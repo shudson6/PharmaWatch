@@ -1,10 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+} from 'chart.js';
+import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial';
+import 'chartjs-adapter-date-fns';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+  CandlestickController,
+  CandlestickElement
+);
 
 export default function Home() {
   const [symbol, setSymbol] = useState('');
@@ -18,16 +41,23 @@ export default function Home() {
       const response = await fetch(`/api/price-history/${symbol}`);
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
-      const labels = data.map((item: any) => item.Date);
-      const closePrices = data.map((item: any) => item.Close);
+      const candlestickData = data.map((item: any) => ({
+        x: new Date(item.Date).getTime(),
+        o: item.Open,
+        h: item.High,
+        l: item.Low,
+        c: item.Close,
+      }));
       setChartData({
-        labels,
         datasets: [
           {
-            label: `${symbol.toUpperCase()} Close Price`,
-            data: closePrices,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1,
+            label: `${symbol.toUpperCase()} Price`,
+            data: candlestickData,
+            color: {
+              up: 'green',
+              down: 'red',
+              unchanged: 'gray',
+            },
           },
         ],
       });
@@ -37,6 +67,27 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: `${symbol.toUpperCase()} Candlestick Chart`,
+      },
+    },
+    scales: {
+      x: {
+        type: 'time' as const,
+        time: {
+          unit: 'day' as const,
+        },
+      },
+    },
   };
 
   return (
@@ -55,7 +106,7 @@ export default function Home() {
       </div>
       {chartData && (
         <div style={{ marginTop: '20px' }}>
-          <Line data={chartData} />
+          <Chart type="candlestick" data={chartData} options={options} />
         </div>
       )}
     </div>
