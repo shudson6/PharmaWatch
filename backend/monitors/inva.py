@@ -15,11 +15,11 @@ DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
 class InvaMonitor(MonitorBase):
 
-    def __init__(self):
-        super().__init__(
-            symbol = "INVA",
-            press_release_url = "https://investor.inva.com/press-releases"
-        )
+    def __init__(self,
+                 symbol = "INVA",
+                 press_release_url = "https://investor.inva.com/press-releases",
+                 ):
+        super().__init__(symbol, press_release_url)
 
     def fetch_news_articles(self, driver=None):
         is_our_driver = driver is None

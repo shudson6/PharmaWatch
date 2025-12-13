@@ -15,11 +15,11 @@ DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
 class TcrxMonitor(MonitorBase):
 
-    def __init__(self):
-        super().__init__(
-            symbol = "TCRX",
-            press_release_url = "https://ir.tscan.com/news-events/press-releases"
-        )
+    def __init__(self,
+                 symbol = "TCRX",
+                 press_release_url = "https://ir.tscan.com/news-events/press-releases",
+                 ):
+        super().__init__(symbol, press_release_url)
 
     def fetch_news_articles(self, driver=None):
         is_our_driver = driver is None

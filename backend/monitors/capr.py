@@ -16,11 +16,11 @@ DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
 class CaprMonitor(MonitorBase):
 
-    def __init__(self):
-        super().__init__(
-            symbol = "CAPR",
-            press_release_url = "https://www.capricor.com/investors/news-events/press-releases",
-        )
+    def __init__(self,
+                 symbol = "CAPR",
+                 press_release_url = "https://www.capricor.com/investors/news-events/press-releases",
+                 ):
+        super().__init__(symbol, press_release_url)
 
     def fetch_news_articles(self, driver=None):
         is_our_driver = driver is None
