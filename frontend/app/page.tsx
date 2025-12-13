@@ -239,11 +239,19 @@ export default function Home() {
         <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #fff', backgroundColor: '#000', color: '#fff' }}>
           <h3>Article Summaries</h3>
           {selectedArticles.map((article, idx) => (
-            <div key={idx} style={{ marginBottom: '10px' }}>
+            <div key={idx} style={{ marginBottom: '15px', borderBottom: '1px solid #444', paddingBottom: '10px' }}>
               <p style={{ margin: '5px 0', fontWeight: 'bold' }}>
                 Date: {article.date} | Category: {article.category} | Sentiment: {article.sentiment}
               </p>
               <p style={{ margin: '5px 0' }}>{article.summary}</p>
+              <details style={{ marginTop: '10px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Title</summary>
+                <p style={{ margin: '5px 0', paddingLeft: '10px' }}>{article.title}</p>
+              </details>
+              <details style={{ marginTop: '10px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Content</summary>
+                <p style={{ margin: '5px 0', paddingLeft: '10px', whiteSpace: 'pre-wrap' }}>{article.content}</p>
+              </details>
             </div>
           ))}
         </div>
