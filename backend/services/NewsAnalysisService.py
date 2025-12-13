@@ -80,10 +80,8 @@ def summarize_article(article: dict):
         }
     }
 
-def _determine_summary_length(content: str):
-    length = len(content)
-    if length < 10000:
-        return 6
-    if length < 20000:
-        return 8
-    return 10
+def queue_unsummarized_articles():
+    articles = db.get_unsummarized_articles()
+    logger.info(f"Queuing {len(articles)} unsummarized articles")
+    for article in articles:
+        queue_article(article)

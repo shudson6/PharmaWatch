@@ -27,8 +27,9 @@ logger.info("Starting PharmaWatch")
 load_dotenv()
 
 logger.info("Firing up ThreadPoolExecutor and scheduling jobs")
-executor = ThreadPoolExecutor()
+executor = ThreadPoolExecutor(max_workers=3)
 executor.submit(NewsAnalysisService.start)
+executor.submit(NewsAnalysisService.queue_unsummarized_articles)
 executor.submit(MonitoringService.start)
 
 # wait til jobs are done, which will never happen since they're infinite loops :)

@@ -15,31 +15,6 @@ def get_connection_info() -> dict:
 def get_connection() -> psycopg2.extensions.connection:
     return psycopg2.connect(**get_connection_info())
 
-def get_titles_for_symbol(symbol: str):
-    """Get a list of (title, date) tuples for the given symbol."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT title, date
-        FROM investing.press_release
-        WHERE symbol = %s;
-    """, (symbol,))
-    titles = [(row[0], row[1]) for row in cursor.fetchall()]
-    cursor.close()
-    return titles
-
-def get_watch_list():
-    """Get the list of symbols being actively monitored."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT symbol FROM investing.watchlist
-        WHERE active;
-    """)
-    watchlist = [row[0] for row in cursor.fetchall()]
-    cursor.close()
-    return watchlist
-
 def get_article(id_or_symbol: (str | int), title: str=None):
     """Retrieve a news article from the database.
 
@@ -136,6 +111,57 @@ def get_article_with_summary(id_or_symbol: (str | int), title: str=None):
             "prompt": row[14],
         }
     return None
+
+def get_titles_for_symbol(symbol: str):
+    """Get a list of (title, date) tuples for the given symbol."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT title, date
+        FROM investing.press_release
+        WHERE symbol = %s;
+    """, (symbol,))
+    titles = [(row[0], row[1]) for row in cursor.fetchall()]
+    cursor.close()
+    return titles
+
+def get_unsummarized_articles():
+    """Get a list of articles that do not yet have summaries."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT pr.id, pr.symbol, pr.date, pr.title, pr.content_type,
+               pr.content, pr.url, pr.retrieved_ts
+        FROM investing.press_release pr
+        LEFT JOIN investing.pr_summary ps ON pr.id = ps.pr_id
+        WHERE ps.id IS NULL;
+    """)
+    articles = []
+    for row in cursor.fetchall():
+        articles.append({
+            "pr_id": row[0],
+            "symbol": row[1],
+            "date": row[2],
+            "title": row[3],
+            "content_type": row[4],
+            "content": row[5],
+            "document_url": row[6],
+            "retrieved_ts": row[7],
+        })
+    cursor.close()
+    return articles
+
+def get_watch_list():
+    """Get the list of symbols being actively monitored."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT symbol FROM investing.watchlist
+        WHERE active;
+    """)
+    watchlist = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    return watchlist
 
 def save_new_article(symbol, date, title, content_type, content, url, retrieved_ts):
     """Save an article to the database. Return the new article's ID.
