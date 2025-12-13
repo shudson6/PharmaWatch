@@ -240,13 +240,13 @@ export default function Home() {
           <h3>Article Summaries</h3>
           {selectedArticles.map((article, idx) => (
             <div key={idx} style={{ marginBottom: '15px', borderBottom: '1px solid #444', paddingBottom: '10px' }}>
+              <h4 style={{ margin: '5px 0', color: '#fff' }}>{article.title}</h4>
               <p style={{ margin: '5px 0', fontWeight: 'bold' }}>
                 Date: {article.date} | Category: {article.category} | Sentiment: {article.sentiment}
               </p>
-              <p style={{ margin: '5px 0' }}>{article.summary}</p>
-              <details style={{ marginTop: '10px' }}>
-                <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Title</summary>
-                <p style={{ margin: '5px 0', paddingLeft: '10px' }}>{article.title}</p>
+              <details open style={{ marginTop: '10px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Summary</summary>
+                <p style={{ margin: '5px 0', paddingLeft: '10px' }}>{article.summary}</p>
               </details>
               <details style={{ marginTop: '10px' }}>
                 <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Content</summary>
