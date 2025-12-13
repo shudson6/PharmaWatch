@@ -9,13 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from monitors import MonitorBase
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
-
 class CaprMonitor(MonitorBase):
-
     def __init__(self,
                  symbol = "CAPR",
                  press_release_url = "https://www.capricor.com/investors/news-events/press-releases",
@@ -45,7 +39,7 @@ class CaprMonitor(MonitorBase):
                         "url": url,
                     })
             except Exception as e:
-                logger.warning(f"Error processing article: {e}")
+                self.logger.warning(f"Error processing article: {e}")
         for a in article_data:
             try:
                 driver.get(a['url'])
@@ -53,7 +47,7 @@ class CaprMonitor(MonitorBase):
                     EC.presence_of_element_located((By.LINK_TEXT, "Download as PDF"))
                 ).get_attribute("href")
             except Exception as e:
-                logger.warning(f"{type(e)} occurred getting pdf link for article {a['title'][:32]}:\n{e}")
+                self.logger.warning(f"{type(e)} occurred getting pdf link for article {a['title'][:32]}:\n{e}")
         is_our_driver and driver.quit()
         for a in article_data:
             try:

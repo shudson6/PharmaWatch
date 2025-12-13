@@ -1,8 +1,4 @@
-import logging
-
 from monitors.aldx import AldxMonitor
-
-logger = logging.getLogger(__name__)
 
 class MistMonitor(AldxMonitor):
     def __init__(self,

@@ -9,12 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from monitors import MonitorBase
 
-logger = logging.getLogger(__name__)
-
-DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
-
 class AgioMonitor(MonitorBase):
-
     def __init__(self,
                  symbol = "AGIO",
                  press_release_url = "https://investor.agios.com/news-events/press-releases",
@@ -49,7 +44,7 @@ class AgioMonitor(MonitorBase):
                         "document_url": url,
                     })
             except Exception as e:
-                logger.warning(f"Error processing article: {e}")
+                self.logger.warning(f"Error processing article: {e}")
         is_our_driver and driver.quit()
         for a in article_data:
             try:

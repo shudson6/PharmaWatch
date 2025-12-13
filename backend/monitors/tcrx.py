@@ -9,11 +9,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from monitors import MonitorBase
 
-logger = logging.getLogger(__name__)
-
-DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
 class TcrxMonitor(MonitorBase):
+    logger = logging.getLogger(__name__)
 
     def __init__(self,
                  symbol = "TCRX",
@@ -31,7 +29,7 @@ class TcrxMonitor(MonitorBase):
                 By.XPATH,
                 "//div[@class='nir-widget--content']/div/article"
             )))
-        logger.debug(f"Found {len(articles)} articles on page")
+        self.logger.debug(f"Found {len(articles)} articles on page")
         article_data = []
         for article in articles:
             try:
@@ -50,7 +48,7 @@ class TcrxMonitor(MonitorBase):
                         "document_url": url,
                     })
             except Exception as e:
-                logger.warning(f"Error processing article: {e}")
+                self.logger.warning(f"Error processing article: {e}")
         is_our_driver and driver.quit()
         for a in article_data:
             try:

@@ -1,6 +1,4 @@
 import datetime
-import logging
-import os
 
 import pymupdf4llm
 from selenium.webdriver.common.by import By
@@ -9,12 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from monitors import MonitorBase
 
-logger = logging.getLogger(__name__)
-
-DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
-
 class AldxMonitor(MonitorBase):
-
     def __init__(self,
                  symbol = "ALDX",
                  press_release_url = "https://ir.aldeyra.com/press-releases",
@@ -31,7 +24,7 @@ class AldxMonitor(MonitorBase):
                 By.XPATH,
                 "//div[@class='nir-widget--list']/article"
             )))
-        logger.debug(f"Found {len(articles)} articles on page")
+        self.logger.debug(f"Found {len(articles)} articles on page")
         article_data = []
         for article in articles:
             try:
@@ -51,7 +44,7 @@ class AldxMonitor(MonitorBase):
                         "document_url": url,
                     })
             except Exception as e:
-                logger.warning(f"Error processing article: {e}")
+                self.logger.warning(f"Error processing article: {e}")
         is_our_driver and driver.quit()
         for a in article_data:
             try:
