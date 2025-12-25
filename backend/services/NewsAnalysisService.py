@@ -59,15 +59,17 @@ following JSON format: {{\
 
 def summarize_article(article: dict):
     prepared_prompt = PROMPT_TEMPLATE.format(article['content'])
-    payload = { "prompt": [{
-        "role": "user",
-        "content": prepared_prompt,
-    }]}
+    payload = {
+        "max_new_tokens": 1500,
+        "messages": [{
+            "role": "user",
+            "content": prepared_prompt,
+        }]}
     logger.info(f"Fetching summary for article {article['title']}")
-    response = requests.get(os.getenv("SUMMARY_URL"), json=payload)
+    response = requests.post(os.getenv("INFERENCE_URL"), json=payload)
     response.raise_for_status()
     response_body = response.json()
-    reply = json.loads(response_body.get('reply', ''))
+    reply = json.loads(response_body.get('reply', {}).get('content', ''))
     logger.info(f"Summary received for article {article['title']}")
     return {
         "summary": reply['summary'],
