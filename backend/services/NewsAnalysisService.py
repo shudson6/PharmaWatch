@@ -26,11 +26,10 @@ def start():
             summary_data = summarize_article(article)
             logger.info(f"Article {article['title']} processed")
         except Exception as e:
-            logger.warning(
-                "%s occurred while summarizing article %s",
-                type(e), article['title']
+            logger.error(
+                "%s occurred while summarizing article %s: %s",
+                type(e), article['title'], e
             )
-            logger.warning(e)
             continue
         logger.debug(f"Saving summary for article {article['title']}")
         try:
@@ -42,7 +41,7 @@ def start():
             )
             logger.info(f"Summary for {article['title']} saved")
         except Exception as e:
-            logger.warning(
+            logger.error(
                 "%s occured while saving article %s. article not saved.",
                 type(e), article['title']
             )
