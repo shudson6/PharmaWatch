@@ -22,7 +22,7 @@ def start():
         missing_monitors = []
         articles_not_saved = 0
         other_errors = []
-        watchlist = ['otlk'] #db.get_watch_list()
+        watchlist = db.get_watch_list()
         logger.debug(f"Found {len(watchlist)} watches: {watchlist}")
         driver = MonitorBase('').start_web_driver(headless=True)
         for symbol in watchlist:
