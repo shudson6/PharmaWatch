@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import logging
 import os
@@ -91,5 +92,9 @@ def start():
         while next_time < end_time:
             next_time += int(os.getenv("PASSIVE_WATCH_INTERVAL"))
         wait_time = next_time - end_time
-        logger.info(f"Next run in {wait_time}s")
+        logger.info(
+            "Next run in %ds at %s",
+            wait_time,
+            datetime.datetime.fromtimestamp(next_time).time().isoformat()
+        )
         time.sleep(wait_time)
