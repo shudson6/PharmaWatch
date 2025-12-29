@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 
 import pymupdf4llm
 from selenium.webdriver.common.by import By
