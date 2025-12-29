@@ -1,5 +1,6 @@
 import importlib
 import logging
+import os
 import time
 
 from monitors import MonitorBase
@@ -88,7 +89,7 @@ def start():
         
         next_time = start_time
         while next_time < end_time:
-            next_time += 60 * 5
+            next_time += int(os.getenv("PASSIVE_WATCH_INTERVAL"))
         wait_time = next_time - end_time
         logger.info(f"Next run in {wait_time}s")
         time.sleep(wait_time)
