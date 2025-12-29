@@ -10,7 +10,34 @@ from services import MonitoringService, NewsAnalysisService
 
 load_dotenv()
 
+class Color(StrEnum):
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[95m"
+    CYAN = "\033[96m"
+    WHITE = "\033[97m"
+    RESET = "\033[0m"
+
+class ColorFormatter(logging.Formatter):
+    def __init__(self, fmt=None, datefmt=None, style='%', validate=True, *, defaults=None):
+        super().__init__(fmt, datefmt, style, validate, defaults=defaults)
+
+    def format(self, record: logging.LogRecord):
+        message = super().format(record)
+        color = {
+            logging.DEBUG: Color.CYAN,
+            logging.WARNING: Color.YELLOW,
+            logging.ERROR: Color.RED,
+            logging.CRITICAL: Color.MAGENTA,
+        }.get(record.levelno, None)
+        if color:
+            return color + message + Color.RESET
+        return message
+
 def setup_logging():
+    FORMAT="%(asctime)s:%(levelname)s:%(name)s:%(lineno)d: %(message)s"
     file_handler = logging.FileHandler(
         os.path.join(os.getcwd(), "logs",
                     "pharmawatch-" + datetime.now().strftime("%Y%m%d-%H%M") + ".log"),
@@ -18,9 +45,9 @@ def setup_logging():
         delay=True,
     )
     stream_handler = logging.StreamHandler()
-
+    stream_handler.setFormatter(ColorFormatter(FORMAT))
     logging.basicConfig(
-        format="%(asctime)s:%(levelname)s:%(name)s:%(lineno)d: %(message)s",
+        format=FORMAT,
         handlers=[file_handler, stream_handler],
     )
     logger = logging.getLogger(__name__)
