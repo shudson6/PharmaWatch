@@ -38,20 +38,22 @@ class ColorFormatter(logging.Formatter):
 
 def setup_logging():
     FORMAT="%(asctime)s:%(levelname)s:%(name)s:%(lineno)d: %(message)s"
-    file_handler = logging.FileHandler(
-        os.path.join(os.getcwd(), "logs",
-                    "pharmawatch-" + datetime.now().strftime("%Y%m%d-%H%M") + ".log"),
-        encoding="utf-8",
-        delay=True,
-    )
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(ColorFormatter(FORMAT))
     logging.basicConfig(
         format=FORMAT,
-        handlers=[file_handler, stream_handler],
+        handlers=[stream_handler],
     )
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
+
+    if os.getenv("LOG_TO_FILE", False):
+        logger.addHandler(logging.FileHandler(
+            os.path.join(os.getcwd(), "logs",
+                        "pharmawatch-" + datetime.now().strftime("%Y%m%d-%H%M") + ".log"),
+            encoding="utf-8",
+            delay=False,
+        ))
 
     os.makedirs(os.path.join(os.getcwd(), "logs"), exist_ok=True)
     return logger
