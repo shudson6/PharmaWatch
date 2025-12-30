@@ -6,3 +6,10 @@ _*/
 # python stuff
 .venv/
 __pycache__/
+
+# docker stuff
+.dockerignore
+.env.docker
+compose.yaml
+Dockerfile
+README.Docker.md
