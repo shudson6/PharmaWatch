@@ -1,0 +1,10 @@
+company:
+  vnda:
+    name: Vanda Pharmaceuticals Inc
+    symbol: VNDA
+    press_releases:
+      url: https://www.vandapharma.com/investors?locale=en
+      article_xpath: "//section[@id='recentNews']/div/div/div[2]/div"
+      date_xpath: "h6"
+      title_xpath: "a"
+      url_xpath: "a/@href"

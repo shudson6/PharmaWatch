@@ -2,12 +2,12 @@ import datetime
 import logging
 import os
 
+from bs4 import BeautifulSoup
 import dateparser
+from lxml import etree
+import pymupdf.layout
+import pymupdf4llm
 import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
 
 from services import db
 
@@ -15,32 +15,41 @@ DEFAULT_DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 
 class MonitorBase:
 
-    def __init__(self, symbol: str, press_release_url=None):
+    def __init__(self, symbol: str, search_params=None):
         self.symbol = symbol.upper()
-        self.press_release_url =\
-            press_release_url.lower() if press_release_url else None
+        self.search_params = search_params or {}
         self.logger = logging.getLogger('.'.join([self.__module__, self.__class__.__name__]))
-
-    @staticmethod
-    def start_web_driver(headless: bool = True):
-        logger = logging.getLogger(__name__)
-        logger.debug("Starting Chrome WebDriver")
-        options = Options()
-        options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-        if headless:
-            options.add_argument("--headless=new")
-        driver = webdriver.Chrome(
-            options=options,
-            service=ChromeService(ChromeDriverManager().install())
-        )
-        logger.debug("Chrome WebDriver started")
-        return driver
 
     def get_existing_titles(self):
         return db.get_titles_for_symbol(self.symbol)
 
     def fetch_news_articles(self, driver=None):
-        raise NotImplementedError("fetch_news_articles must be implemented by a subclass")
+        resp = requests.get(self.search_params.get("url"))
+        soup = BeautifulSoup(resp.content, "html.parser")
+        dom = etree.HTML(str(soup))
+        articles = dom.xpath(self.search_params.get("article_xpath"))
+        article_data = []
+        for article in articles:
+            date_el = article.xpath(self.search_params.get("date_xpath"))[0]
+            date = date_el.text or date_el.findtext(".//")
+            title_el = article.xpath(self.search_params.get("title_xpath"))[0]
+            title = title_el.text or title_el.findtext(".//")
+            url = article.xpath(self.search_params.get("url_xpath"))[0]
+            article_data.append({
+                "date": date.strip(),
+                "title": title.strip(),
+                "document_url": url,
+            })
+        for a in article_data:
+            try:
+                a['content'] = pymupdf4llm.to_markdown(
+                    self.download_file(a['document_url'])
+                )
+                a['content-type'] = "text/markdown"
+                a['retrieved_ts'] = datetime.datetime.now()
+            except Exception as e:
+                logging.warning(f"{type(e)} occurred while loading article {a['title'][:32]}:\n{e}")
+        return article_data
 
     def parse_date(self, date_str: str) -> datetime.date:
         return dateparser.parse(date_str).date()
