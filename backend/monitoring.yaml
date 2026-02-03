@@ -3,8 +3,117 @@ company:
     name: Vanda Pharmaceuticals Inc
     symbol: VNDA
     press_releases:
-      url: https://www.vandapharma.com/investors?locale=en
+      url: https://www.vandapharma.com/investors?locale=en/#news
       article_xpath: "//section[@id='recentNews']/div/div/div[2]/div"
       date_xpath: "h6"
       title_xpath: "a"
       url_xpath: "a/@href"
+
+  fbio:
+    name: Fortress Biotech Inc
+    symbol: FBIO
+    press_releases:
+      url: https://www.fortressbiotech.com/investors/news-events/press-releases
+      container_class: main-content
+      article_tag: article
+      date_xpath: "time"
+      title_xpath: "a"
+      url_xpath: "a/@href"
+      pdf_link_text: "Download as PDF"
+      requires_article_visit: true
+
+  aqst:
+    name: Aquestive Therapeutics Inc
+    symbol: AQST
+    press_releases:
+      url: https://investors.aquestive.com/news-releases
+      article_xpath: "//div[@id='ndq-content']//div[@class='nir-widget--list']/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: "a"
+      url_xpath: "a/@href"
+      pdf_link_text: "PDF Version"
+      requires_article_visit: true
+
+  agio:
+    name: Agios Pharmaceuticals Inc
+    symbol: AGIO
+    press_releases:
+      url: https://investor.agios.com/news-events/press-releases
+      article_xpath: "//article//article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      pdf_link_text: "View PDF"
+
+  otlk:
+    name: Outlook Therapeutics Inc
+    symbol: OTLK
+    press_releases:
+      url: https://ir.outlooktherapeutics.com/news-and-events/press-releases
+      article_xpath: "//div[@class='nir-widget--news-table']/table/tbody/tr"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      url_xpath: ".//div[@class='nir-widgets-file-link']/a/@href"
+
+  tcrx:
+    name: TScan Therapeutics Inc
+    symbol: TCRX
+    press_releases:
+      url: https://ir.tscan.com/news-events/press-releases
+      article_xpath: "//div[@class='nir-widget--content']/div/article"
+      date_xpath: "./div[1]/span"
+      date_join: true
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      url_xpath: ".//div[@class='nir-widgets-file-link']/a/@href"
+
+  inva:
+    name: Innoviva Inc
+    symbol: INVA
+    press_releases:
+      url: https://investor.inva.com/press-releases
+      article_xpath: "//div[@class='nir-widget--list']/table/tbody/tr"
+      date_xpath: ".//*[@class='news-date-wrap']"
+      title_xpath: ".//*[@class='news-title-wrap']"
+      pdf_link_text: "PDF Version"
+
+  bcrx:
+    name: BioCryst Pharmaceuticals Inc
+    symbol: BCRX
+    press_releases:
+      url: https://ir.biocryst.com/news-events/press-releases
+      article_xpath: "//div[@class='nir-widget--content']/div/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      url_xpath: ".//div[@class='nir-widgets-file-link']/a/@href"
+
+  aldx:
+    name: Aldeyra Therapeutics Inc
+    symbol: ALDX
+    press_releases:
+      url: https://ir.aldeyra.com/press-releases
+      article_xpath: "//div[@class='nir-widget--list']/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      pdf_link_text: "PDF Version"
+
+  mist:
+    name: Milestone Pharmaceuticals Inc
+    symbol: MIST
+    press_releases:
+      url: https://investors.milestonepharma.com/press-releases
+      article_xpath: "//div[@class='nir-widget--list']/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      pdf_link_text: "PDF Version"
+
+  capr:
+    name: Capricor Therapeutics Inc
+    symbol: CAPR
+    press_releases:
+      url: https://www.capricor.com/investors/news-events/press-releases
+      container_id: mainContent
+      article_tag: article
+      date_xpath: "time"
+      title_xpath: "a"
+      url_xpath: "a/@href"
+      pdf_link_text: "Download as PDF"
+      requires_article_visit: true
