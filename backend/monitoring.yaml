@@ -1,13 +1,58 @@
 company:
-  vnda:
-    name: Vanda Pharmaceuticals Inc
-    symbol: VNDA
+  agio:
+    name: Agios Pharmaceuticals Inc
+    symbol: AGIO
     press_releases:
-      url: https://www.vandapharma.com/investors?locale=en/#news
-      article_xpath: "//section[@id='recentNews']/div/div/div[2]/div"
-      date_xpath: "h6"
+      url: https://investor.agios.com/news-events/press-releases
+      article_xpath: "//article//article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      pdf_link_text: "View PDF"
+
+  aldx:
+    name: Aldeyra Therapeutics Inc
+    symbol: ALDX
+    press_releases:
+      url: https://ir.aldeyra.com/press-releases
+      article_xpath: "//div[@class='nir-widget--list']/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      pdf_link_text: "PDF Version"
+
+  aqst:
+    name: Aquestive Therapeutics Inc
+    symbol: AQST
+    press_releases:
+      url: https://investors.aquestive.com/news-releases
+      article_xpath: "//div[@id='ndq-content']//div[@class='nir-widget--list']/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
       title_xpath: "a"
       url_xpath: "a/@href"
+      pdf_link_text: "PDF Version"
+      requires_article_visit: true
+
+  bcrx:
+    name: BioCryst Pharmaceuticals Inc
+    symbol: BCRX
+    press_releases:
+      url: https://ir.biocryst.com/news-events/press-releases
+      article_xpath: "//div[@class='nir-widget--content']/div/article"
+      date_xpath: ".//*[@class='nir-widget--news--date-time']"
+      title_xpath: ".//*[@class='nir-widget--news--headline']"
+      url_xpath: ".//div[@class='nir-widgets-file-link']/a/@href"
+
+  capr:
+    name: Capricor Therapeutics Inc
+    symbol: CAPR
+    press_releases:
+      url: https://www.capricor.com/investors/news-events/press-releases
+      container_id: mainContent
+      article_tag: article
+      date_xpath: "time"
+      title_xpath: "a"
+      url_xpath: "a/@href"
+      pdf_link_text: "Download as PDF"
+      requires_article_visit: true
 
   fbio:
     name: Fortress Biotech Inc
@@ -22,27 +67,25 @@ company:
       pdf_link_text: "Download as PDF"
       requires_article_visit: true
 
-  aqst:
-    name: Aquestive Therapeutics Inc
-    symbol: AQST
+  inva:
+    name: Innoviva Inc
+    symbol: INVA
     press_releases:
-      url: https://investors.aquestive.com/news-releases
-      article_xpath: "//div[@id='ndq-content']//div[@class='nir-widget--list']/article"
-      date_xpath: ".//*[@class='nir-widget--news--date-time']"
-      title_xpath: "a"
-      url_xpath: "a/@href"
+      url: https://investor.inva.com/press-releases
+      article_xpath: "//div[@class='nir-widget--list']/table/tbody/tr"
+      date_xpath: ".//*[@class='news-date-wrap']"
+      title_xpath: ".//*[@class='news-title-wrap']"
       pdf_link_text: "PDF Version"
-      requires_article_visit: true
 
-  agio:
-    name: Agios Pharmaceuticals Inc
-    symbol: AGIO
+  mist:
+    name: Milestone Pharmaceuticals Inc
+    symbol: MIST
     press_releases:
-      url: https://investor.agios.com/news-events/press-releases
-      article_xpath: "//article//article"
+      url: https://investors.milestonepharma.com/press-releases
+      article_xpath: "//div[@class='nir-widget--list']/article"
       date_xpath: ".//*[@class='nir-widget--news--date-time']"
       title_xpath: ".//*[@class='nir-widget--news--headline']"
-      pdf_link_text: "View PDF"
+      pdf_link_text: "PDF Version"
 
   otlk:
     name: Outlook Therapeutics Inc
@@ -65,55 +108,12 @@ company:
       title_xpath: ".//*[@class='nir-widget--news--headline']"
       url_xpath: ".//div[@class='nir-widgets-file-link']/a/@href"
 
-  inva:
-    name: Innoviva Inc
-    symbol: INVA
+  vnda:
+    name: Vanda Pharmaceuticals Inc
+    symbol: VNDA
     press_releases:
-      url: https://investor.inva.com/press-releases
-      article_xpath: "//div[@class='nir-widget--list']/table/tbody/tr"
-      date_xpath: ".//*[@class='news-date-wrap']"
-      title_xpath: ".//*[@class='news-title-wrap']"
-      pdf_link_text: "PDF Version"
-
-  bcrx:
-    name: BioCryst Pharmaceuticals Inc
-    symbol: BCRX
-    press_releases:
-      url: https://ir.biocryst.com/news-events/press-releases
-      article_xpath: "//div[@class='nir-widget--content']/div/article"
-      date_xpath: ".//*[@class='nir-widget--news--date-time']"
-      title_xpath: ".//*[@class='nir-widget--news--headline']"
-      url_xpath: ".//div[@class='nir-widgets-file-link']/a/@href"
-
-  aldx:
-    name: Aldeyra Therapeutics Inc
-    symbol: ALDX
-    press_releases:
-      url: https://ir.aldeyra.com/press-releases
-      article_xpath: "//div[@class='nir-widget--list']/article"
-      date_xpath: ".//*[@class='nir-widget--news--date-time']"
-      title_xpath: ".//*[@class='nir-widget--news--headline']"
-      pdf_link_text: "PDF Version"
-
-  mist:
-    name: Milestone Pharmaceuticals Inc
-    symbol: MIST
-    press_releases:
-      url: https://investors.milestonepharma.com/press-releases
-      article_xpath: "//div[@class='nir-widget--list']/article"
-      date_xpath: ".//*[@class='nir-widget--news--date-time']"
-      title_xpath: ".//*[@class='nir-widget--news--headline']"
-      pdf_link_text: "PDF Version"
-
-  capr:
-    name: Capricor Therapeutics Inc
-    symbol: CAPR
-    press_releases:
-      url: https://www.capricor.com/investors/news-events/press-releases
-      container_id: mainContent
-      article_tag: article
-      date_xpath: "time"
+      url: https://www.vandapharma.com/investors?locale=en/#news
+      article_xpath: "//section[@id='recentNews']/div/div/div[2]/div"
+      date_xpath: "h6"
       title_xpath: "a"
       url_xpath: "a/@href"
-      pdf_link_text: "Download as PDF"
-      requires_article_visit: true
