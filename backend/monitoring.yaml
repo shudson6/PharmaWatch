@@ -46,8 +46,7 @@ company:
     symbol: CAPR
     press_releases:
       url: https://www.capricor.com/investors/news-events/press-releases
-      container_id: mainContent
-      article_tag: article
+      article_xpath: "//div[@id='mainContent']//article"
       date_xpath: "time"
       title_xpath: "a"
       url_xpath: "a/@href"
@@ -59,8 +58,7 @@ company:
     symbol: FBIO
     press_releases:
       url: https://www.fortressbiotech.com/investors/news-events/press-releases
-      container_class: main-content
-      article_tag: article
+      article_xpath: "//article"
       date_xpath: "time"
       title_xpath: "a"
       url_xpath: "a/@href"
