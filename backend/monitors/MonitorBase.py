@@ -21,8 +21,10 @@ class MonitorBase:
             press_release_url.lower() if press_release_url else None
         self.logger = logging.getLogger('.'.join([self.__module__, self.__class__.__name__]))
 
-    def start_web_driver(self, headless: bool = True):
-        self.logger.debug(f"{self.symbol} starting Chrome WebDriver")
+    @staticmethod
+    def start_web_driver(headless: bool = True):
+        logger = logging.getLogger(__name__)
+        logger.debug("Starting Chrome WebDriver")
         options = Options()
         options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         if headless:
@@ -31,7 +33,7 @@ class MonitorBase:
             options=options,
             service=ChromeService(ChromeDriverManager().install())
         )
-        self.logger.debug(f"{self.symbol} Chrome WebDriver started")
+        logger.debug("Chrome WebDriver started")
         return driver
 
     def get_existing_titles(self):
